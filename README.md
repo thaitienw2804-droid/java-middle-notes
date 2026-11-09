@@ -13,4 +13,5 @@ Kho lưu trữ kế hoạch học tập, ghi chú kỹ thuật và ngân hàng c
 4. **[`ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md`](ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md)** — **Chiến lược cày phỏng vấn 4 tuần Sau Tết & Đóng gói kinh nghiệm FPT**:
    - Phân tích format vòng thi của 3 nhóm công ty, khung đóng gói 3 câu chuyện thực tế ở FPT và lịch rải CV 3 đợt (Wave 1/2/3).
 5. **[`skill-audit.md`](skill-audit.md)** — **Bảng tự chấm và theo dõi tiến độ 19 kỹ năng cốt lõi**.
+6. **[`checklist-lo-trinh-java-middle-chi-tiet.xlsx`](checklist-lo-trinh-java-middle-chi-tiet.xlsx)** — **File Excel Checklist chi tiết từng ngày (17 Sheets, >1.350 mục kiến thức, bẫy phỏng vấn, lab & câu hỏi tự động tính % tiến độ)**.
 

@@ -46,6 +46,15 @@
 
 **Code tay:** `api-gateway` với route `/api/auth/**`, `/api/products/**`, `/api/orders/**`; global filter verify JWT + gắn traceId; rate limit Redis theo user; CORS cấu hình tại Gateway.
 
+> **⚠️ 2 Bẫy Spring Cloud Gateway trên Production (Rất hay hỏi khi CV có ghi API Gateway):**
+> 1. **Bẫy chặn (Block) Netty EventLoop Thread trong Spring Cloud Gateway (WebFlux)**:
+>    - Bản `spring-cloud-starter-gateway` chuẩn chạy trên **Project Reactor + Netty** chỉ có số luồng EventLoop rất ít (`2 × CPU cores`, ví dụ 4–8 threads xử lý hàng chục nghìn kết nối).
+>    - Nếu trong `GlobalFilter` (xác thực JWT/kiểm tra Blacklist) bạn gọi hàm **Blocking** như `RestTemplate`, JDBC, hoặc `StringRedisTemplate` đồng bộ → **chặn đứng EventLoop thread**, làm sập thông lượng của toàn bộ Gateway!
+>    - **Cách sửa**: Bắt buộc dùng **`ReactiveStringRedisTemplate` / `WebClient`** trả về `Mono<Void>` (hoặc nếu dùng bản `spring-cloud-starter-gateway-mvc` trên Servlet thì bật Java 21 Virtual Threads).
+> 2. **Bẫy Double CORS Header**:
+>    - Nếu vừa bật CORS ở `api-gateway` lại vừa bật `@CrossOrigin` ở `order-service` bên dưới, response trả về cho trình duyệt sẽ có **2 giá trị `Access-Control-Allow-Origin: https://shop.com, https://shop.com`** → trình duyệt báo lỗi CORS ngay lập tức!
+>    - **Cách sửa**: Chỉ cấu hình CORS tại Gateway (hoặc dùng `DedupeResponseHeader` filter của Spring Cloud Gateway).
+
 **Tự kiểm tra:** Gateway làm gì? Auth đặt ở Gateway hay service? Gateway chết thì sao? 502 vs 504 debug thế nào?
 
 ---
@@ -58,6 +67,12 @@
 - **Distributed tracing**: trace, span, context propagation; **Micrometer Tracing** + OpenTelemetry → Zipkin/Jaeger/Tempo; traceId trong log (MDC).
 
 **Code tay:** Order → Catalog có `@CircuitBreaker` + `@Retry` + `@TimeLimiter` + fallback; tắt catalog-service và quan sát trạng thái circuit qua Actuator; chạy Zipkin, xem 1 trace đi Gateway → Order → Catalog.
+
+> **⚠️ Bẫy Thứ tự Aspect giữa `@Retry` và `@CircuitBreaker` trong Resilience4j:**
+> - Thứ tự bọc mặc định của Resilience4j từ ngoài vào trong là: **`Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( Function ) ) ) ) )`**.
+> - **Vì sao `Retry` bọc ngoài `CircuitBreaker`?**
+>   - Để mỗi lần gọi thất bại đều được `CircuitBreaker` ghi nhận ngay. Khi `CircuitBreaker` chuyển sang `OPEN` (ngắt mạch), nó ném `CallNotPermittedException` — cấu hình `@Retry(ignoreExceptions = CallNotPermittedException.class)` sẽ **dừng retry ngay lập tức (Fail-Fast)** chứ không cố retry vô ích vào service đã chết!
+>   - Ngược lại, nếu đặt `CircuitBreaker` bọc ngoài `Retry`, khi service đích chết, hệ thống phải chờ hết cả 3 lần Retry (tốn $3 \times \text{timeout}$) mới được tính là 1 lần lỗi cho CircuitBreaker!
 
 **Tự kiểm tra:** Circuit breaker mở/đóng khi nào? Retry có thể gây thảm họa gì? Trace khác log thế nào?
 

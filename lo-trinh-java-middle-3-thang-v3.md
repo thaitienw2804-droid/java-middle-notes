@@ -4,6 +4,7 @@
 - **Chiến lược 4 tuần Sau Tết & Đóng gói kinh nghiệm FPT:** [`ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md`](ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md)
 - **Ngân hàng câu hỏi + Đáp án chi tiết theo 4 mức độ khó (Level 1 → 4):** [`ngan-hang-cau-hoi-phong-van-theo-do-kho.md`](ngan-hang-cau-hoi-phong-van-theo-do-kho.md)
 - **Bảng tự chấm kỹ năng:** [`skill-audit.md`](skill-audit.md)
+- **File Excel Checklist chi tiết (17 Sheets, tự động tính % tiến độ):** [`checklist-lo-trinh-java-middle-chi-tiet.xlsx`](checklist-lo-trinh-java-middle-chi-tiet.xlsx)
 
 > v3 giữ nguyên tinh thần v2 (Network, DNS, Gateway, Server, Monitoring, CI/CD thật) nhưng **sửa các lỗ hổng kiến thức nền** và **sắp lại thứ tự** để ưu tiên "nắm chắc từng phần".
 

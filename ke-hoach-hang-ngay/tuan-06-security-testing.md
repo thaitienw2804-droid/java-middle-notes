@@ -29,6 +29,11 @@
 
 **Code tay:** đăng ký/đăng nhập với `UserDetailsService` + BCrypt + DB; custom 401/403 theo error contract.
 
+> **⚠️ Bẫy `SecurityContextHolder` bị `null` khi gọi `@Async` / `CompletableFuture`:**
+> - Mặc định `SecurityContextHolder` lưu thông tin user đăng nhập vào **`ThreadLocal` (`MODE_THREADLOCAL`)**. Khi từ Controller/Service gọi sang hàm `@Async` hoặc `CompletableFuture.supplyAsync()`, luồng con mới không có `SecurityContext` (`getAuthentication() == null`)!
+> - **Bẫy sai lầm**: Đổi sang `MODE_INHERITABLETHREADLOCAL` với Thread Pool sẽ gây **lộ thông tin user (Cross-Request Security Leak)** vì thread con trong pool sau khi tạo lần đầu sẽ tái sử dụng mãi và giữ luôn `SecurityContext` cũ của user đầu tiên!
+> - **Cách sửa chuẩn**: Bọc Executor bằng **`DelegatingSecurityContextAsyncTaskExecutor`** (hoặc `DelegatingSecurityContextExecutorService`) — nó tự động copy `SecurityContext` sang luồng con khi bắt đầu task và **tự động `clearContext()` trong `finally`** ngay khi task kết thúc.
+
 **Tự kiểm tra:** Kể luồng 1 request qua Security filter chain. 401 vs 403? Vì sao REST API thường disable CSRF?
 
 **LeetCode (20'):** Implement Trie, Word Search.
@@ -45,6 +50,13 @@
 - Lỗi hay gặp: không kiểm tra `exp`, chấp nhận `alg: none`, secret yếu/commit lên git, token quá dài hạn.
 
 **Code tay:** `JwtAuthenticationFilter extends OncePerRequestFilter`; endpoint `/auth/login`, `/auth/refresh` (rotation), `/auth/logout` (revoke).
+
+> **⚠️ 2 Bẫy JWT & Refresh Token trong phỏng vấn Bảo mật (Bank / Fintech):**
+> 1. **Refresh Token Reuse Detection (Token Family)**:
+>    - Khi dùng Refresh Token Rotation, mỗi lần `/auth/refresh` sẽ tạo Refresh Token mới (`RT_2`) và đánh dấu `RT_1` là `REVOKED` (nhưng vẫn giữ bản ghi `RT_1` trong Redis/DB theo cùng `family_id`).
+>    - Nếu kẻ tấn công đánh cắp được `RT_1` và đem gọi `/auth/refresh` sau khi người dùng thật đã xoay sang `RT_2` (hoặc ngược lại): Server thấy một token đã `REVOKED` được gửi lên → phát hiện ngay có rò rỉ → **lập tức thu hồi toàn bộ token thuộc `family_id` đó**, bắt đăng nhập lại!
+> 2. **Bẫy Algorithm Confusion (`alg: none` và `RS256 → HS256`)**:
+>    - Khi parse JWT bằng thư viện `jjwt` / `Nimbus`, phải dùng `parseSignedClaims()` (cấm tuyệt đối `alg: none` — không chữ ký) và cố định thuật toán kỳ vọng (tránh việc hacker lấy Public Key của RS256 làm Secret đối xứng của HS256 để tự ký token giả).
 
 **Tự kiểm tra:** JWT vs session? Refresh token để đâu, rotation là gì? Logout với JWT làm thế nào?
 
@@ -91,6 +103,13 @@
 - Hoàn thiện auth JWT + refresh + RBAC trong shop-order-platform.
 - Integration test: đăng nhập → tạo đơn → xem đơn người khác bị 403; repository test với Testcontainers Postgres; test chống oversell với 2 thread.
 - Bật JaCoCo, chạy `mvn verify`.
+
+> **⚠️ Bẫy gắn `@Transactional` lên hàm `@Test` trong Integration Test (EPAM / KMS hay hỏi):**
+> - Khi bạn gắn `@Transactional` lên một hàm `@Test` (hoặc dùng `@DataJpaTest` có sẵn `@Transactional`), toàn bộ hàm test chạy trong **cùng 1 Persistence Context mở xuyên suốt** và tự rollback khi kết thúc.
+> - **3 Hậu quả nguy hiểm**:
+>   1. **Che giấu lỗi `LazyInitializationException`**: Trong hàm test vẫn gọi được `order.getItems().size()` ngon lành vì Session vẫn mở, nhưng lên Production tắt `open-in-view` là nổ lỗi ngay!
+>   2. **Che giấu lỗi thiếu `flush()`**: Nếu không gọi `entityManager.flush(); entityManager.clear();` trong test, câu lệnh `findById()` chỉ đọc lại object từ L1 Cache trên RAM chứ không hề bắn câu `SELECT` xuống Postgres để kiểm tra constraint!
+>   3. **Không test được đa luồng / `TestRestTemplate` / `WebTestClient`**: Vì dữ liệu của hàm `@Test` chưa commit xuống DB nên các thread khác (như 2 thread test chống oversell hoặc Tomcat worker thread thật) sẽ **không nhìn thấy dữ liệu bạn vừa `save()` trong hàm test**!
 
 **LeetCode (30'):** Rotting Oranges, Clone Graph.
 

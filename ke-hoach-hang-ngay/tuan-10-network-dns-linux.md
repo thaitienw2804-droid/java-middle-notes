@@ -28,6 +28,11 @@
 
 **Code tay:** `dig +trace` 1 domain thật; tạo subdomain trỏ về VPS (domain giá rẻ / DuckDNS miễn phí); đổi `/etc/hosts` để kiểm chứng ưu tiên.
 
+> **⚠️ Bẫy JVM DNS Caching trên Production (Cloud / AWS RDS Failover / K8s):**
+> - Ngoài TTL của DNS record và cache của OS, **chính JVM (`InetAddress`) cũng tự cache kết quả phân giải DNS**!
+> - Nếu chạy với SecurityManager hoặc cấu hình cũ, JVM có thể cache IP mãi mãi (`-1`) hoặc lâu hơn TTL của DNS. Hệ quả: Khi Database (AWS RDS) hoặc downstream service failover đổi sang IP mới trên cùng tên miền DNS, ứng dụng Java **vẫn cố gọi vào IP cũ đã chết** cho tới khi restart pod!
+> - **Cách sửa chuẩn**: Cấu hình `networkaddress.cache.ttl=30` (hoặc `5` giây) và `networkaddress.cache.negative.ttl=0` trong `java.security` / JVM properties.
+
 **Tự kiểm tra:** Gõ `api.shop.com` DNS phân giải thế nào? A vs CNAME? Vì sao `dig` ra IP mới mà máy vẫn ra IP cũ?
 
 **LeetCode (20'):** Pacific Atlantic Water Flow, Kth Smallest Element in BST.
@@ -59,6 +64,13 @@
 
 **Code tay:** Nginx reverse proxy trước Gateway với upstream 2 instance Gateway (round robin), tắt 1 instance quan sát.
 
+> **⚠️ 2 Bẫy cấu hình Nginx Reverse Proxy trước Spring Boot / Gateway:**
+> 1. **Mất Keep-Alive từ Nginx vào Upstream (Gây cạn cổng TCP / `TIME_WAIT` tràn ngập)**:
+>    - Mặc định `proxy_pass` của Nginx dùng giao thức **`HTTP/1.0` và gửi header `Connection: close`** tới Gateway → mỗi request lại phải bắt tay TCP 3 bước mới!
+>    - **Cách sửa**: Trong khối `upstream` thêm `keepalive 64;`, và trong `location` thêm `proxy_http_version 1.1; proxy_set_header Connection "";`.
+> 2. **Rate Limit theo IP ở Gateway khóa nhầm toàn bộ người dùng**:
+>    - Khi có Nginx đứng trước, IP kết nối trực tiếp vào Gateway là IP nội bộ của Nginx. Nếu không truyền `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;` ở Nginx VÀ bật `server.forward-headers-strategy=framework` (cùng cấu hình `trusted-proxies`) ở Spring Boot, bộ Rate Limit theo IP sẽ tưởng **mọi khách hàng đều là 1 người** (cùng IP của Nginx) và chặn sạch toàn bộ hệ thống!
+
 **Tự kiểm tra:** L4 vs L7? Reverse vs forward proxy? Sticky session khi nào? Nginx vs Spring Cloud Gateway — dùng cả hai thì mỗi cái làm gì?
 
 ---
@@ -73,6 +85,13 @@
 - Firewall `ufw` (chỉ mở 22, 80, 443), fail2ban; cron (`crontab -e`, cú pháp 5 trường).
 
 **Code tay:** trên VPS: tạo user deploy + SSH key, ufw, cài Docker, chạy app bằng systemd hoặc compose; tự gây "disk đầy" bằng file lớn rồi tìm bằng `du`.
+
+> **⚠️ 2 Bẫy Linux "Đầy ổ đĩa (`No space left on device`)" kinh điển khi vận hành Server:**
+> 1. **`df -h` báo ổ đĩa đầy 100%, nhưng chạy `du -sh /*` cộng lại chỉ thấy tốn có 20% — phần dung lượng kia biến đi đâu?**
+>    - **Nguyên nhân**: Có ai đó vừa dùng lệnh `rm /var/log/app-huge.log` để xóa một file log vài chục GB, **nhưng tiến trình Java đang chạy vẫn giữ File Descriptor mở tới file đó**, nên Linux Kernel chưa giải phóng vùng đĩa!
+>    - **Cách kiểm tra & xử lý**: Chạy `lsof +L1` (hoặc `lsof | grep deleted`) để tìm tiến trình đang giữ file đã xóa. Lần sau không dùng `rm` với file log đang mở mà dùng **`truncate -s 0 app.log`** (hoặc `: > app.log`) để làm rỗng file ngay lập tức mà không cần restart app!
+> 2. **`df -h` báo còn trống 50% GB, nhưng tạo file mới vẫn báo lỗi `No space left on device`**:
+>    - **Nguyên nhân**: **Cạn kiệt Inode (`df -i` báo `IUse% = 100%`)** do ứng dụng hoặc cronjob sinh ra hàng triệu file nhỏ li ti.
 
 **Tự kiểm tra:** Disk đầy xử lý theo thứ tự nào? `kill -9` vs `-15`? Load average 4 trên máy 2 core nghĩa là gì?
 

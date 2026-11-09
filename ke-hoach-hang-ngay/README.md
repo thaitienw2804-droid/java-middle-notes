@@ -3,6 +3,7 @@
 - **Lộ trình tổng:** [`../lo-trinh-java-middle-3-thang-v3.md`](../lo-trinh-java-middle-3-thang-v3.md)
 - **Ngân hàng câu hỏi phỏng vấn theo độ khó tăng dần (Level 1 → Level 4):** [`../ngan-hang-cau-hoi-phong-van-theo-do-kho.md`](../ngan-hang-cau-hoi-phong-van-theo-do-kho.md)
 - **Bảng tự chấm kỹ năng:** [`../skill-audit.md`](../skill-audit.md)
+- **File Excel Checklist từng ngày (17 Sheets):** [`../checklist-lo-trinh-java-middle-chi-tiet.xlsx`](../checklist-lo-trinh-java-middle-chi-tiet.xlsx)
 
 ## Cách dùng
 1. Mỗi sáng mở file tuần hiện tại, đọc mục của ngày hôm nay.
