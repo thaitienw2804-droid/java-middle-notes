@@ -34,6 +34,14 @@
 
 **Code tay:** viết LRU Cache bằng LinkedHashMap; đếm tần suất từ bằng `merge`; demo 2 thread put vào HashMap bị thiếu phần tử vs ConcurrentHashMap.
 
+> **⚠️ Chi tiết bên trong `HashMap` & `ConcurrentHashMap` phải nói chuẩn xác khi phỏng vấn:**
+> - **Điều kiện kép để Treeify**: Bucket chuyển từ LinkedList ($O(n)$) sang Red-Black Tree ($O(\log n)$) khi `binCount >= 8` (`TREEIFY_THRESHOLD`) **VÀ** `table.length >= 64` (`MIN_TREEIFY_CAPACITY`). Nếu bucket đạt 8 phần tử nhưng `capacity < 64` (ví dụ mới khởi tạo 16 hoặc 32), `HashMap` **sẽ chỉ `resize()` gấp đôi** chứ chưa chuyển sang cây! Khi xóa phần tử làm cây giảm còn `<= 6` (`UNTREEIFY_THRESHOLD`) thì chuyển ngược về LinkedList.
+> - **Vì sao `capacity` luôn là lũy thừa của 2 ($2^k$)?** Để phép chia lấy dư `hash % capacity` biến thành phép toán bit `(capacity - 1) & hash` cực nhanh, và khi `resize()` gấp đôi thì mỗi phần tử chỉ cần kiểm tra 1 bit cao để biết nằm nguyên ở `oldIndex` hay nhảy sang `oldIndex + oldCapacity`.
+> - **`ConcurrentHashMap` Java 7 vs Java 8+**:
+>   - Java 7 dùng mảng `Segment[]` (mặc định 16 segment, mỗi segment kế thừa `ReentrantLock`) → khóa cả 1 vùng nhiều bucket.
+>   - Java 8+ bỏ `Segment`, dùng mảng `Node[]` với `volatile` + **CAS (Compare-And-Swap)** khi chèn vào bucket trống, và chỉ **`synchronized` trên chính Node đầu tiên (bucket head)** khi có va chạm (collision) → độ mịn khóa (lock granularity) nhỏ tới từng bucket.
+>   - **Bẫy `ConcurrentHashMap` không cho phép `null` key/value**: Vì trong môi trường đa luồng, nếu `map.get(key)` trả về `null`, bạn không thể phân biệt được là "key không tồn tại" hay "key tồn tại nhưng có giá trị `null`" (không thể dùng `containsKey` để kiểm tra vì giữa 2 lệnh `containsKey` và `get` luồng khác đã có thể thay đổi map!).
+
 **Tự kiểm tra:** Mô tả `put()` của HashMap từng bước. Vì sao load factor 0.75? ConcurrentHashMap Java 7 vs 8?
 
 ---
@@ -94,6 +102,9 @@
 - Record cho DTO, sealed `PaymentResult`, Stream cho báo cáo.
 - Strategy (giảm giá) + Factory (payment) + Observer (OrderCreated → gửi mail/log) + Builder (Order) + Chain of Responsibility (validate đơn: tồn kho → giới hạn số lượng → địa chỉ).
 - Viết JDK dynamic proxy đơn giản log thời gian chạy method (hiểu trước cách Spring AOP làm).
+- **Bài luyện Live Coding Refactoring (15 phút không dùng gợi ý AI — đúng chuẩn thi EPAM / KMS / TymeX)**:
+  - Tự viết 1 hàm xấu ~40 dòng: nhận `List<Order>` có thể `null`, lọc đơn `CONFIRMED` bằng vòng `for`, check `null` lồng 3 cấp, tính tổng tiền theo từng `customerId`, xử lý chiết khấu bằng 4 nhánh `if-else`.
+  - Bấm giờ 15 phút: Refactor sang **Guard Clause + `Optional` + `Stream` (`groupingBy` + `reducing`) + `Strategy Pattern`**, kèm viết 4 Unit Test cho các edge case (`null` list, empty list, order có item `null`, số tiền âm).
 
 **LeetCode (30'):** Product of Array Except Self, Longest Substring Without Repeating Characters.
 

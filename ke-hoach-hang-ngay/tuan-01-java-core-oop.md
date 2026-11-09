@@ -16,7 +16,12 @@
 
 **Code tay:**
 - Viết hàm `swap(Integer a, Integer b)` và `changeName(User u)` rồi giải thích kết quả.
-- Demo Integer cache, demo `BigDecimal` với `new BigDecimal("0.1")` vs `new BigDecimal(0.1)`, `setScale`, `RoundingMode.HALF_UP`.
+- Demo Integer cache, demo `BigDecimal` với `new BigDecimal("0.1")` vs `new BigDecimal(0.1)` vs `BigDecimal.valueOf(0.1)`, `setScale`, `RoundingMode.HALF_UP`.
+
+> **⚠️ Bẫy phỏng vấn thực chiến (Fintech/Bank cực hay hỏi):**
+> - `new BigDecimal(0.1)` nhận vào `double` đã bị sai số nhị phân (`0.10000000000000000555...`), còn `new BigDecimal("0.1")` hoặc `BigDecimal.valueOf(0.1)` mới chính xác.
+> - `new BigDecimal("2.0").equals(new BigDecimal("2.00"))` trả về **`false`** (vì `equals` so cả `scale`), phải dùng **`compareTo() == 0`** khi so sánh giá trị tiền!
+> - `BigDecimal.divide()` nếu thương số vô hạn tuần hoàn (`1 / 3`) mà không truyền ` scale` + `RoundingMode` sẽ ném `ArithmeticException: Non-terminating decimal expansion`.
 
 **Tự kiểm tra:**
 1. Java pass-by-value hay pass-by-reference? Chứng minh bằng code.
@@ -83,6 +88,13 @@
 - Class `Product` có/không override hashCode → bỏ vào HashSet, chứng minh lỗi.
 - Sắp xếp list Order theo status rồi createdAt giảm dần bằng Comparator.
 - Viết hierarchy exception nghiệp vụ: `BusinessException` → `OrderNotFoundException`, `InsufficientStockException`.
+
+> **⚠️ 2 Bẫy `equals/hashCode` & `HashMap` kinh điển (EPAM / KMS / Bank):**
+> 1. **Bẫy không override `equals/hashCode`**: Tạo class `User(String name)` không override `equals/hashCode`, thực hiện `for (int i=0; i<100; i++) map.put(new User("Alice"), i);` → Hỏi `map.size()` bằng bao nhiêu?
+>    - **Đáp án**: **`100`** (nhiều người trả lời nhầm là 1!). Vì mặc định `Object.hashCode()` trả địa chỉ/identity hash khác nhau và `Object.equals()` so sánh `==` tham chiếu. Gọi `map.get(new User("Alice"))` sẽ trả về `null`.
+> 2. **Bẫy dùng Mutable Object làm Key**: Đã override `equals/hashCode` theo field `name`. Sau khi `map.put(user, "ADMIN")`, ta gọi `user.setName("Bob")`.
+>    - **Hậu quả**: `map.get(user)` tính lại hash theo `"Bob"` → tìm sai bucket → trả về `null`. Trong khi đó entry cũ vẫn nằm kẹt vĩnh viễn ở bucket của `"Alice"` → **Memory Leak**. Do đó key của `HashMap` bắt buộc phải **immutable** (`String`, `Integer`, `UUID`, `record`).
+> 3. **Bẫy `equals/hashCode` trên JPA `@Entity`**: Không dùng `@Data` của Lombok trên `@Entity` vì `@GeneratedValue` ID = `null` lúc `Transient`, sau khi `persist()` mới có ID → đổi `hashCode` làm mất phần tử trong `Set`. Giải pháp: dùng business key (natural key) hoặc chỉ so sánh `id != null && id.equals(other.id)` kèm cố định `hashCode() = getClass().hashCode()`.
 
 **Tự kiểm tra:**
 1. Override equals mà không override hashCode thì sao?

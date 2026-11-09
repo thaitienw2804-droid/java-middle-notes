@@ -1,6 +1,9 @@
 # Lộ trình Java Middle v3 — Chắc nền trước, hệ thống sau, project đắp dần
-**Thời gian: 09/11/2026 → 07/02/2027 (13 tuần, chốt trước Tết Đinh Mùi 06/02/2027), sau Tết cày phỏng vấn 3–4 tuần.**
-**Kế hoạch chi tiết từng ngày:** [`java-middle-notes/ke-hoach-hang-ngay/`](java-middle-notes/ke-hoach-hang-ngay/README.md)
+**Thời gian: 09/11/2026 → 07/02/2027 (13 tuần, chốt trước Tết Đinh Mùi 06/02/2027), sau Tết (15/02 → 15/03/2027) cày phỏng vấn 4 tuần.**
+- **Kế hoạch chi tiết từng ngày:** [`ke-hoach-hang-ngay/`](ke-hoach-hang-ngay/README.md)
+- **Chiến lược 4 tuần Sau Tết & Đóng gói kinh nghiệm FPT:** [`ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md`](ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md)
+- **Ngân hàng câu hỏi + Đáp án chi tiết theo 4 mức độ khó (Level 1 → 4):** [`ngan-hang-cau-hoi-phong-van-theo-do-kho.md`](ngan-hang-cau-hoi-phong-van-theo-do-kho.md)
+- **Bảng tự chấm kỹ năng:** [`skill-audit.md`](skill-audit.md)
 
 > v3 giữ nguyên tinh thần v2 (Network, DNS, Gateway, Server, Monitoring, CI/CD thật) nhưng **sửa các lỗ hổng kiến thức nền** và **sắp lại thứ tự** để ưu tiên "nắm chắc từng phần".
 
@@ -65,20 +68,21 @@
 
 | Tuần | Ngày | Chủ đề | Đầu ra kiểm chứng | File chi tiết |
 |---|---|---|---|---|
-| 0 | (đã xong) | Reset + setup, skill audit, CV v0 | compose Postgres + Redis, PR flow | — |
-| 1 | 09–15/11 | Java Core nền + OOP + SOLID | Mini Order Engine thuần Java + 10 câu | [tuần 1](java-middle-notes/ke-hoach-hang-ngay/tuan-01-java-core-oop.md) |
-| 2 | 16–22/11 | Collections (HashMap internals), Generics, Stream, Java 17/21, Design Patterns | LRU cache, 7 pattern có code | [tuần 2](java-middle-notes/ke-hoach-hang-ngay/tuan-02-collections-generics-patterns.md) |
-| 3 | 23–29/11 | Concurrency + JVM + GC | Thread dump, heap dump thật, rate limiter | [tuần 3](java-middle-notes/ke-hoach-hang-ngay/tuan-03-concurrency-jvm.md) |
-| 4 | 30/11–06/12 | Spring Core/Boot/MVC bên trong | shop-order-platform khung monolith | [tuần 4](java-middle-notes/ke-hoach-hang-ngay/tuan-04-spring-core-boot-mvc.md) |
-| 5 | 07–13/12 | SQL sâu + JPA/Hibernate | Báo cáo tối ưu SQL có số liệu, chống oversell | [tuần 5](java-middle-notes/ke-hoach-hang-ngay/tuan-05-sql-jpa.md) |
-| 6 | 14–20/12 | Spring Security + JWT + Testing | Auth + RBAC + Testcontainers xanh | [tuần 6](java-middle-notes/ke-hoach-hang-ngay/tuan-06-security-testing.md) |
-| 7 | 21–27/12 | API design, Idempotency, Redis, Performance, Docker sâu | Monolith Docker hóa + bảng performance | [tuần 7](java-middle-notes/ke-hoach-hang-ngay/tuan-07-api-redis-performance-docker.md) |
-| 8 | 28/12–03/01 | Microservices + API Gateway + Resilience + Tracing | Gateway + 3 service, demo circuit breaker | [tuần 8](java-middle-notes/ke-hoach-hang-ngay/tuan-08-microservices-gateway.md) |
-| 9 | 04–10/01 | Kafka, RabbitMQ, Outbox, Saga, CQRS | Luồng đặt hàng async + 4 demo lỗi | [tuần 9](java-middle-notes/ke-hoach-hang-ngay/tuan-09-kafka-distributed.md) |
-| 10 | 11–17/01 | Network, DNS, TLS, Nginx, Linux | Domain HTTPS trên VPS, backup/restore | [tuần 10](java-middle-notes/ke-hoach-hang-ngay/tuan-10-network-dns-linux.md) |
-| 11 | 18–24/01 | Observability, Alert, Incident, K8s cơ bản | Alert Telegram thật, runbook, minikube | [tuần 11](java-middle-notes/ke-hoach-hang-ngay/tuan-11-observability-k8s.md) |
-| 12 | 25–31/01 | CI/CD + Hardening + README | Pipeline xanh + bằng chứng rollback | [tuần 12](java-middle-notes/ke-hoach-hang-ngay/tuan-12-cicd-hardening.md) |
-| 13 | 01–07/02 | System Design, CV v1, Behavioral, nộp job, **Tết** | CV v1, đã nộp 5–10 job | [tuần 13](java-middle-notes/ke-hoach-hang-ngay/tuan-13-system-design-dong-goi.md) |
+| 0 | (đã xong) | Reset + setup, skill audit, CV v0 | compose Postgres + Redis, PR flow | [`skill-audit.md`](skill-audit.md) |
+| 1 | 09–15/11 | Java Core nền + OOP + SOLID | Mini Order Engine thuần Java + 10 câu | [tuần 1](ke-hoach-hang-ngay/tuan-01-java-core-oop.md) |
+| 2 | 16–22/11 | Collections (HashMap internals), Generics, Stream, Java 17/21, Design Patterns | LRU cache, 7 pattern có code + Live Refactoring | [tuần 2](ke-hoach-hang-ngay/tuan-02-collections-generics-patterns.md) |
+| 3 | 23–29/11 | Concurrency + JVM + GC + Virtual Threads traps | Thread dump, heap dump thật, rate limiter | [tuần 3](ke-hoach-hang-ngay/tuan-03-concurrency-jvm.md) |
+| 4 | 30/11–06/12 | Spring Core/Boot/MVC bên trong (3-level cache, Proxy) | shop-order-platform khung monolith + Chuyện FPT #1 | [tuần 4](ke-hoach-hang-ngay/tuan-04-spring-core-boot-mvc.md) |
+| 5 | 07–13/12 | SQL sâu + JPA/Hibernate Internals (ActionQueue, Batch, Locking) | Báo cáo tối ưu SQL + Chuyện FPT #2, chống oversell | [tuần 5](ke-hoach-hang-ngay/tuan-05-sql-jpa.md) |
+| 6 | 14–20/12 | Spring Security + JWT + Testing | Auth + RBAC + Testcontainers xanh | [tuần 6](ke-hoach-hang-ngay/tuan-06-security-testing.md) |
+| 7 | 21–27/12 | API design, Idempotency 3 lớp, Redis Lua, Performance, Docker sâu | Monolith Docker hóa + bảng performance | [tuần 7](ke-hoach-hang-ngay/tuan-07-api-redis-performance-docker.md) |
+| 8 | 28/12–03/01 | Microservices + API Gateway + Resilience + Tracing | Gateway + 3 service, demo circuit breaker | [tuần 8](ke-hoach-hang-ngay/tuan-08-microservices-gateway.md) |
+| 9 | 04–10/01 | Kafka Production Traps, RabbitMQ, Outbox, Saga, Đối soát | Luồng đặt hàng async + 4 demo lỗi + Đối soát | [tuần 9](ke-hoach-hang-ngay/tuan-09-kafka-distributed.md) |
+| 10 | 11–17/01 | Network, DNS, TLS, Nginx, Linux | Domain HTTPS trên VPS, backup/restore | [tuần 10](ke-hoach-hang-ngay/tuan-10-network-dns-linux.md) |
+| 11 | 18–24/01 | Observability Triad, Alert, Incident, K8s cơ bản | Alert Telegram thật, runbook, minikube | [tuần 11](ke-hoach-hang-ngay/tuan-11-observability-k8s.md) |
+| 12 | 25–31/01 | CI/CD + Hardening + README | Pipeline xanh + bằng chứng rollback + Chuyện FPT #3 | [tuần 12](ke-hoach-hang-ngay/tuan-12-cicd-hardening.md) |
+| 13 | 01–07/02 | System Design, CV v1, Behavioral, nộp job Wave 1, **Tết** | CV v1, đã nộp 5–10 job | [tuần 13](ke-hoach-hang-ngay/tuan-13-system-design-dong-goi.md) |
+| **14–17** | **15/02–15/03** | **Cày phỏng vấn Sau Tết (Level 1→4), Live Coding, System Design, Deal Offer** | **Đạt 2–3 Offer Java Middle** | **[tuần 14–17](ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md)** |
 
 ```mermaid
 flowchart LR
@@ -118,9 +122,9 @@ Yêu cầu chức năng & phi chức năng giữ như v2.
 
 ---
 
-## 5. Ngân hàng câu hỏi phỏng vấn
+## 5. Ngân hàng câu hỏi phỏng vấn (Tổng hợp đầy đủ 12 nhóm)
 
-> Các nhóm **DNS & Network, API Gateway, Server/Giám sát, CI/CD, System Design** giữ nguyên như v2 (xem [v2](lo-trinh-java-middle-3-thang-v2.md#ngân-hàng-câu-hỏi-phỏng-vấn--phải-trả-lời-tự-tin-tự-luyện-miệng)). Dưới đây là các nhóm **bổ sung** — đây là phần bị hỏi nhiều nhất.
+> 💡 **Bản có đáp án chi tiết phân theo 4 mức độ khó tăng dần (Level 1 → Level 4):** Xem tại [`ngan-hang-cau-hoi-phong-van-theo-do-kho.md`](ngan-hang-cau-hoi-phong-van-theo-do-kho.md).
 
 ### Java Core & OOP
 1. JDK/JRE/JVM; Java chạy từ source đến mã máy (bytecode, JIT).
@@ -196,6 +200,64 @@ Yêu cầu chức năng & phi chức năng giữ như v2.
 3. Bất đồng kỹ thuật với lead/đồng nghiệp.
 4. Bạn dùng AI coding assistant thế nào mà vẫn đảm bảo chất lượng?
 5. Vì sao chuyển việc; mong muốn 1–2 năm tới.
+
+### DNS & Network (Gộp đầy đủ từ v2)
+1. Gõ `api.shop.com` thì chuyện gì xảy ra, theo đúng thứ tự?
+2. Record A, CNAME, MX, TXT khác nhau thế nào? TTL để làm gì, đổi DNS sao lâu mới có hiệu lực?
+3. DNS cache ở những tầng nào? Vì sao `dig` ra IP mới mà máy mình vẫn ra IP cũ?
+4. TCP handshake 3 bước để làm gì? UDP dùng khi nào?
+5. HTTP/1.1, HTTP/2, HTTP/3 khác nhau ở điểm nào đáng kể nhất?
+6. TLS handshake làm gì? Certificate hết hạn thì user thấy gì, server phải làm gì?
+7. Load Balancer L4 và L7 khác nhau thế nào? Sticky session là gì, khi nào cần, khi nào tránh?
+8. Reverse Proxy khác Forward Proxy thế nào? Nginx trong hệ thống của bạn đóng vai trò gì?
+9. CORS thực chất là ai chặn ai? Vì sao Postman gọi được mà trình duyệt lại chặn?
+10. NAT, public IP, private IP, VPC/subnet giải thích trong 1 phút?
+11. Timeout, retry, circuit breaker: retry bừa có thể gây thảm họa gì?
+12. Khi API chậm, bạn chẩn đoán theo thứ tự nào: network, gateway, app, DB, hay service khác?
+
+### API Gateway
+1. Vì sao cần Gateway, client gọi thẳng từng service thì sao?
+2. Gateway làm những việc gì: routing, auth, rate limit, CORS, logging, tracing?
+3. Gateway chết thì sao? Làm sao để Gateway không thành single point of failure?
+4. Rate limiting implement ở Gateway hay ở từng service, hay cả hai?
+5. Auth nên đặt ở Gateway hay ở từng service? Token validate ở đâu?
+6. API versioning đặt ở Gateway có lợi gì?
+7. Gateway khác Nginx và khác Load Balancer ở điểm nào?
+8. Request đi qua Gateway bị lỗi 502/504 thì bạn debug từ đâu trước?
+
+### Server, Giám sát và Thông báo trạng thái
+1. Server chết lúc 2h sáng thì ai biết, biết bằng cách nào, trong bao lâu?
+2. Health check, readiness và liveness khác nhau thế nào? Dùng sai thì hậu quả gì?
+3. Disk đầy, RAM đầy, CPU 100%: thứ tự xử lý và lệnh kiểm tra của bạn là gì?
+4. Log nên ghi những gì, không nên ghi những gì? Log tập trung để làm gì?
+5. Metrics, Logs, Traces khác nhau thế nào? Khi nào xem cái nào?
+6. Alert nào đáng gửi Telegram lúc nửa đêm, alert nào chỉ nên gửi email sáng hôm sau?
+7. Backup Postgres thế nào, restore thử bao lâu một lần? Backup chưa restore thử thì sao?
+8. Deploy không downtime bằng rolling, blue-green, canary — chọn cái nào cho hệ thống nhỏ/lớn?
+9. Migration DB không backward-compatible thì deploy sẽ vỡ ở bước nào?
+10. Incident P1 xảy ra, bạn viết incident note gồm những mục nào?
+11. Status page để làm gì, ai xem, cập nhật bằng tay hay tự động?
+
+### CI/CD & Pipeline
+1. Kể toàn bộ pipeline của project bạn, từ lúc tạo PR đến lúc chạy production.
+2. Pipeline gồm những stage nào, stage nào fail thì dừng, stage nào chỉ cảnh báo?
+3. Secret quản lý thế nào, vì sao không commit secret vào code?
+4. Deploy staging tự động, deploy production cần approve tay — vì sao phân biệt vậy?
+5. Image Docker tag bằng `latest` có nguy hiểm gì? Bạn tag bằng gì?
+6. Pipeline chậm thì tối ưu từ đâu: cache, job song song, hay bỏ test?
+7. Test fail trên CI nhưng chạy local lại pass — bạn debug thế nào?
+8. Rollback nhanh nhất trong hệ thống của bạn là gì, mất bao lâu?
+9. Jenkins, GitHub Actions, GitLab CI khác nhau ở điểm nào, bạn chọn cái nào và vì sao?
+10. Database migration chạy trong pipeline ở bước nào, rollback migration thì sao?
+11. Monorepo nhiều service thì pipeline chỉ build service đổi code bằng cách nào?
+12. Làm sao biết deploy mới có lỗi: xem metric nào, trong bao lâu, ai quyết định rollback?
+
+### System Design & Backend tổng hợp
+1. Thiết kế hệ thống đặt hàng / Flash Sale chịu tải cao: bottleneck đầu tiên ở đâu, chống oversell bằng Redis Lua + Kafka thế nào?
+2. Đặt hàng trùng, trừ kho trùng, thanh toán trùng — thiết kế Idempotency phòng thủ 3 lớp thế nào? Khi gọi cổng thanh toán bị timeout (không biết đã trừ tiền chưa) thì xử lý và đối soát (Reconciliation) ra sao?
+3. Khi nào dùng Kafka, khi nào dùng RabbitMQ, khi nào chỉ cần gọi REST đồng bộ?
+4. Cache ở những tầng nào, cache sai thì hậu quả gì, invalidate thế nào?
+5. Bảng 1 tỷ dòng đã đánh index nhưng query vẫn chậm 30s — kiểm tra index, selectivity, covering index, keyset pagination, partitioning theo thứ tự nào?
 
 ---
 

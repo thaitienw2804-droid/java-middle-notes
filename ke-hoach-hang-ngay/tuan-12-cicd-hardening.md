@@ -55,6 +55,7 @@
 - **Jenkins** (kinh nghiệm FPT): Jenkinsfile declarative (`pipeline`, `agent`, `stages`, `post`), credentials binding, shared library; so sánh với GitHub Actions/GitLab CI.
 
 **Code tay:** `cd.yml`: merge `main` → deploy staging tự động → smoke test → job `deploy-prod` cần approve → script `rollback.sh <tag>`; đo thời gian rollback (< 5 phút).
+- **Đóng gói câu chuyện FPT #3 (30')**: Viết 1 trang note so sánh **Pipeline Jenkins / GitLab CI ở dự án FPT của bạn** với pipeline GitHub Actions của `shop-order-platform`: Ở FPT có những stage nào? Quản lý secret/environment ra sao? Khi deploy lỗi ở FPT thì quy trình rollback thực tế diễn ra thế nào? Điểm nào ở FPT chưa tối ưu mà bạn đã cải tiến trong project cá nhân?
 
 **Tự kiểm tra:** Kể pipeline của bạn từ PR đến production. Rollback nhanh nhất là gì, mất bao lâu? Jenkins vs GitHub Actions vs GitLab CI?
 

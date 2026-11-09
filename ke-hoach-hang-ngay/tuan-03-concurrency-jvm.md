@@ -45,6 +45,13 @@
 
 **Code tay:** tạo deadlock chuyển tiền 2 tài khoản → lấy thread dump bằng `jstack` → sửa bằng lock theo thứ tự id; producer-consumer bằng BlockingQueue; giới hạn 3 request đồng thời bằng Semaphore.
 
+> **⚠️ 2 Bẫy `ThreadLocal` & Deadlock thực chiến:**
+> 1. **`ThreadLocal` trên Tomcat Thread Pool gây 2 hậu quả**:
+>    - **Cross-Request Data Leak (Nguy hiểm nhất)**: Tomcat tái sử dụng worker thread. Nếu Request 1 của User A lưu `TenantContext`/`UserContext` vào `ThreadLocal` mà không xóa, Request 2 của User B dùng lại đúng thread đó sẽ **đọc nhầm dữ liệu/quyền của User A**!
+>    - **Memory Leak**: Mỗi `Thread` giữ `ThreadLocalMap` với Entry có key là `WeakReference<ThreadLocal>` nhưng **value là Strong Reference**. Khi thread sống mãi trong pool, value không bao giờ được GC thu hồi nếu không gọi **`threadLocal.remove()` trong khối `finally`** (hoặc `HandlerInterceptor.afterCompletion`).
+> 2. **Quy tắc vàng chống Deadlock khi khóa nhiều tài nguyên (Chuyển tiền A ↔ B)**:
+>    - Luôn sắp xếp thứ tự khóa cố định theo ID: `long first = Math.min(fromId, toId); long second = Math.max(fromId, toId);` rồi mới lock `first` → `second`.
+
 **Tự kiểm tra:** Deadlock là gì, phòng và phát hiện thế nào? ThreadLocal leak khi nào?
 
 ---
@@ -60,6 +67,12 @@
 
 **Code tay:** giả lập trang chi tiết đơn hàng gọi 3 "service" (user, product, shipping) mỗi cái sleep 300ms: tuần tự (900ms) vs CompletableFuture song song (~300ms), có xử lý lỗi + timeout.
 
+> **⚠️ 3 Bẫy `ThreadPoolExecutor` & `CompletableFuture` hay rớt vòng kỹ thuật (MoMo / Bank / EPAM):**
+> 1. **Bài toán đếm số thread chạy**: Cho `corePoolSize = 5`, `maxPoolSize = 10`, `queueCapacity = 100`. Có **15 task** gửi vào cùng lúc thì có mấy thread đang chạy?
+>    - **Đáp án**: **Chỉ 5 thread chạy** (10 task còn lại nằm đợi trong `workQueue`!). Vì `ThreadPoolExecutor` chỉ tạo thêm thread mới vượt `corePoolSize` lên `maxPoolSize` **sau khi `workQueue` đã đầy 100% (100/100)**.
+> 2. **Bẫy nuốt Exception của `submit()`**: Gọi `executor.execute(runnable)` nếu ném exception thì in ra stack trace; nhưng gọi `executor.submit(runnable)` thì exception bị gói kín bên trong `Future` — nếu không gọi `future.get()` thì **exception biến mất hoàn toàn trong im lặng**!
+> 3. **Bẫy `CompletableFuture.supplyAsync()` không truyền Executor riêng**: Mặc định dùng chung `ForkJoinPool.commonPool()` (kích thước = `CPU cores - 1`). Nếu chạy tác vụ I/O blocking (gọi DB/HTTP) trên common pool, chỉ vài request sẽ làm nghẽn toàn bộ `parallelStream` và các `CompletableFuture` khác trên toàn JVM. **Luôn truyền custom `Executor` riêng (Bulkhead pattern)!**
+
 **Tự kiểm tra:** Giải thích 7 tham số ThreadPoolExecutor. Queue đầy thì sao? `thenApply` vs `thenCompose`?
 
 **LeetCode (20'):** Maximum Subarray, Merge Intervals.
@@ -74,6 +87,14 @@
 - ClassLoader: Bootstrap → Platform → Application, **parent delegation**; quá trình load → link (verify, prepare, resolve) → init.
 
 **Code tay:** chạy 10.000 task sleep 1s bằng platform thread pool 200 vs `Executors.newVirtualThreadPerTaskExecutor()`, so thời gian.
+
+> **⚠️ 3 Cạm bẫy Production của Java 21 Virtual Threads (Câu hỏi phân loại Middle/Senior):**
+> 1. **CPU-bound không nhanh hơn**: Virtual Thread chỉ phát huy tác dụng khi gặp **Blocking I/O** (JVM tự unmount `Continuation` khỏi OS Carrier Thread để Carrier Thread chạy việc khác). Với tác vụ nặng CPU (mã hóa, nén, parse JSON khổng lồ), Virtual Thread **không nhanh hơn** mà còn tốn thêm chi phí lập lịch.
+> 2. **Thread Pinning (`synchronized` trap)**: Trên Java 21 (trước JEP 491 ở Java 24), nếu Virtual Thread thực hiện blocking I/O bên trong khối **`synchronized`** hoặc gọi hàm `native`/JNI, nó bị **ghim chặt (pinned)** vào OS Carrier Thread, không unmount được. Nếu cả 8 Carrier Thread (trên máy 8 core) đều bị pinned chờ DB → toàn bộ ứng dụng treo cứng (sự cố thực tế của Netflix).
+>    - **Cách phát hiện & sửa**: Bật `-Djdk.tracePinnedThreads=full` hoặc xem event `jdk.VirtualThreadPinned` trên JFR; thay `synchronized` quanh I/O bằng **`ReentrantLock`**.
+> 3. **Tuyệt đối không Pool Virtual Thread — Dùng `Semaphore` để chống DDoS Downstream**:
+>    - Mỗi task tạo mới 1 Virtual Thread. Nhưng vì có thể tạo 100.000 Virtual Thread cùng lúc, bạn mất đi "van chặn tự nhiên" của thread pool cũ → 100.000 Virtual Thread cùng bắn xuống DB hoặc 3rd-party API sẽ làm sập downstream ngay lập tức.
+>    - **Cách sửa**: Dùng **`Semaphore`** (ví dụ `new Semaphore(50)`) hoặc **Resilience4j Bulkhead / RateLimiter** để giới hạn số lượng truy cập đồng thời vào tài nguyên hữu hạn.
 
 **Tự kiểm tra:** Virtual thread khác platform thread? Khi nào không có lợi? Heap chia vùng thế nào? Metaspace là gì?
 

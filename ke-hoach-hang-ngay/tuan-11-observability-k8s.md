@@ -79,6 +79,7 @@
 - Hoàn thiện stack trên VPS: Prometheus, Grafana, Alertmanager→Telegram, Loki, Uptime Kuma, Zipkin/Tempo (Grafana/Loki chỉ truy cập qua SSH tunnel hoặc có auth).
 - Kịch bản "chaos" và chụp ảnh từng bước: (1) tắt service → alert, (2) bắn k6 tải cao → latency alert, (3) consumer Kafka dừng → lag tăng, (4) từ traceId trong log → mở trace.
 - (Tùy chọn) đưa toàn bộ lên minikube bằng manifest/Helm.
+- **Lưu ý sống còn khi đi phỏng vấn System Design (ANZ / NAB / Grab / Bank)**: Nhiều ứng viên Middle thiết kế API, DB, Cache, Kafka rất tốt nhưng **bị đánh trượt ở vòng System Design vì quên hoàn toàn phần Observability (Metrics, Distributed Tracing `traceId`, Structured Logs, Health Check & Alerting)**. Từ tuần này, mọi bài vẽ System Design của bạn bắt buộc phải có góc "Observability & Alerting" ở dưới sơ đồ!
 
 **LeetCode (30'):** Search a 2D Matrix, Time Based Key-Value Store.
 

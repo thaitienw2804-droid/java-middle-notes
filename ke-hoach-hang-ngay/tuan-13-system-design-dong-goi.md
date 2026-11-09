@@ -18,9 +18,11 @@
 
 ## Ngày 86 — Thứ 3 (02/02): System Design thực chiến + CV v1
 **Bài luyện:**
-- **Rate limiter phân tán** (Redis + token bucket/sliding window, đặt ở Gateway, xử lý khi Redis chết — fail open hay fail close).
-- **Hệ thống thông báo** (Kafka, nhiều kênh, retry, ưu tiên, chống gửi trùng, template).
-- **Flash sale / đặt hàng chịu tải cao** (chống oversell: Redis decrement + queue + DB constraint; idempotency; rate limit; cache sản phẩm) — gắn với project của bạn.
+- **Chống thanh toán trùng / Idempotency 3 lớp** (`Idempotency-Key` ở Gateway + Redis Distributed Lock `SET NX EX` fail-fast `409` + DB Unique Constraint & State Machine `WHERE status = 'PENDING'`).
+- **Rate limiter phân tán** (Redis + token bucket/sliding window bằng Lua Script, đặt ở Gateway, xử lý khi Redis chết — fail open hay fail close).
+- **Hệ thống thông báo** (Kafka, nhiều kênh, retry bậc thang `@RetryableTopic`, ưu tiên, chống gửi trùng, template).
+- **Flash sale / đặt hàng chịu tải cao (100k user tranh 1.000 sản phẩm)**: CDN + SSE/WebSocket cho Read Path → Rate Limit ở Gateway → **Redis Lua Script** kiểm tra & trừ kho atomic trên RAM → đẩy Kafka (`202 Accepted`) → Worker ghi DB + Job 15 phút hoàn kho đơn treo — gắn trực tiếp với project của bạn.
+- **Vẽ trực tiếp kiến trúc dự án (Whiteboard Defense 15 phút)**: Luyện vừa vẽ trên Excalidraw vừa nói miệng kiến trúc dự án ở FPT và dự án `shop-order-platform` (Naver, Zalo, MB Bank, EPAM cực kỳ hay bắt vẽ trực tiếp khi phỏng vấn!). Always thêm hộp **Observability Triad (Prometheus/Grafana + Zipkin Tracing + Loki Logs + Alertmanager)**.
 
 **CV v1 (2h):**
 - Project shop-order-platform lên đầu phần project, có link GitHub + demo.
@@ -58,13 +60,15 @@
 
 ---
 
-## Sau Tết: Giai đoạn cày phỏng vấn (khoảng 15/02 → 15/03/2027)
-| Mỗi ngày (2h) | Mỗi tuần |
+## Sau Tết: Giai đoạn cày phỏng vấn chuyên sâu (Tuần 14–17: 15/02 → 15/03/2027)
+> Chi tiết từng tuần sau Tết và chiến lược thi theo từng nhóm công ty xem tại: [`tuan-14-17-chien-luoc-phong-van-sau-tet.md`](tuan-14-17-chien-luoc-phong-van-sau-tet.md) và [`../ngan-hang-cau-hoi-phong-van-theo-do-kho.md`](../ngan-hang-cau-hoi-phong-van-theo-do-kho.md).
+
+| Mỗi ngày (2–2.5h) | Mỗi tuần |
 |---|---|
-| 30' hỏi đáp Java Core/Spring/SQL (flashcard) | 2 bài System Design |
-| 30' 1 bài LeetCode medium (Blind 75 / NeetCode 150) | 1–2 mock interview ghi âm |
-| 30' đọc lại note tuần yếu nhất | Nộp thêm 5–10 job, cập nhật bảng theo dõi |
-| 30' trả lời phỏng vấn thật đã gặp, bổ sung vào ngân hàng | Sau mỗi buổi phỏng vấn: ghi lại câu bị hỏi trong 30' |
+| 40' ôn theo độ khó tăng dần (Level 1 → Level 4 trong ngân hàng câu hỏi) | 2 bài System Design (có vẽ Excalidraw + nhớ đưa Observability vào) |
+| 35' 1 bài Live Coding Medium (không dùng gợi ý IDE, tự viết test case + đọc Big-O) | 1–2 buổi Mock Interview ghi âm (bao gồm 1 buổi bằng tiếng Anh) |
+| 25' ôn lại 3 câu chuyện dự án FPT + dự án `shop-order-platform` | Rải CV theo 3 đợt (Wave 1 thử lửa → Wave 2 mục tiêu → Wave 3 chốt deal) |
+| 20' hậu kiểm sau mỗi buổi phỏng vấn thật: ghi lại câu bị hỏi + viết lại đáp án chuẩn | Cập nhật bảng theo dõi phỏng vấn & lương offer |
 
 **Checklist "đủ tự tin" (cuối tuần 13):** xem cuối file lộ trình v3.
 

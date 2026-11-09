@@ -29,6 +29,16 @@
 
 **Code tay:** `PaymentProcessor` nhiều implementation, chọn theo type bằng `Map<String, PaymentProcessor>`; tạo lỗi circular dependency rồi sửa; demo singleton bean có field state bị race condition khi nhiều request.
 
+> **⚠️ Chi tiết bên trong Spring Container về Circular Dependency (EPAM / Bank hay hỏi sâu):**
+> - **Vì sao Setter/Field Injection giải được vòng lặp `A ↔ B` còn Constructor Injection thì nổ `BeanCurrentlyInCreationException` ngay?**
+>   - Với Setter/Field Injection, Spring dùng **3-Level Cache** trong `DefaultSingletonBeanRegistry`:
+>     1. `singletonObjects` (Cấp 1: Bean đã khởi tạo và inject hoàn chỉnh).
+>     2. `earlySingletonObjects` (Cấp 2: Bean ран (early reference) đã qua `ObjectFactory`, chưa populate xong thuộc tính).
+>     3. `singletonFactories` (Cấp 3: `ObjectFactory` tạo early proxy/reference ngay sau khi gọi constructor của A).
+>   - Khi tạo A (gọi constructor xong) → đưa factory của A vào Cấp 3 → đi populate B → tạo B → B cần A → lấy early reference của A từ Cấp 3 lên Cấp 2 → B hoàn tất → A hoàn tất!
+>   - Với **Constructor Injection**, ngay bước đầu tiên gọi `new A(b)` đã cần `b` tồn tại trước khi có thể đưa A vào Cấp 3 → bế tắc hoàn toàn (Fail-Fast).
+> - **Cách sửa chuẩn thiết kế**: Không lạm dụng `@Lazy` để che giấu mùi thiết kế; hãy **tách phần logic chung ra Bean thứ 3 (`ServiceC`)** hoặc dùng **Domain Event (`ApplicationEventPublisher`)** để cắt chiều phụ thuộc trực tiếp.
+
 **Tự kiểm tra:** IoC là gì? Vì sao constructor injection? Singleton bean có thread-safe không?
 
 **LeetCode (20'):** Search in Rotated Sorted Array, 3Sum.
@@ -44,6 +54,11 @@
 - `@Transactional` trên method private/protected không chạy; checked exception mặc định không rollback (`rollbackFor`).
 
 **Code tay:** viết Aspect `@LogExecutionTime` thật bằng `@Around`; tái hiện lỗi self-invocation với `@Transactional` (log SQL thấy không rollback) rồi sửa.
+
+> **⚠️ 3 Cách sửa lỗi Self-Invocation (`@Transactional` / `@Async` / `@Cacheable`) khi phỏng vấn:**
+> 1. **Tách sang Service/Component khác (Khuyến nghị số 1 — đúng SRP)**: Ví dụ tách `OrderPersistenceService` hoặc `NotificationAsyncService` riêng để lời gọi đi qua Spring Proxy.
+> 2. **Sử dụng `TransactionTemplate` (Programmatic Transaction)**: Không phụ thuộc proxy đối với giao dịch DB, kiểm soát phạm vi transaction cực kỳ chính xác.
+> 3. **Tự inject chính mình (`@Lazy @Autowired private OrderService self;`)** hoặc `AopContext.currentProxy()` (chỉ dùng khi không thể tách class).
 
 **Tự kiểm tra:** Kể bean lifecycle. AOP trong Spring hoạt động thế nào? Vì sao gọi nội bộ method `@Transactional` không chạy?
 
@@ -86,6 +101,7 @@
 - Áp dụng đủ: constructor injection, profile, `@ConfigurationProperties`, MDC log, AOP log thời gian, error contract, validation, MapStruct.
 - `@Scheduled` job đơn giản (hủy đơn PENDING quá 15 phút) — ghi chú vấn đề chạy nhiều instance → cần ShedLock (học lại tuần 9).
 - Upload file ảnh sản phẩm (`MultipartFile`, giới hạn size, validate content type, lưu local) — câu hỏi thực tế hay gặp.
+- **Đóng gói câu chuyện FPT #1 (30')**: Viết 1 trang note về **Dự án Migration sang Spring Boot ở FPT** của bạn: Hệ thống cũ là gì? Vì sao migrate? Cấu trúc module, chuẩn hóa `GlobalExceptionHandler`, Validation, Logging MDC và cách đảm bảo tương thích API cũ/mới thế nào? (Chuẩn bị sẵn số liệu số lượng API/module bạn phụ trách).
 - Viết README khung.
 
 **LeetCode (30'):** Lowest Common Ancestor of BST, Binary Tree Level Order Traversal.

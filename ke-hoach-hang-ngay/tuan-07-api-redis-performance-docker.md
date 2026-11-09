@@ -30,6 +30,15 @@
 
 **Code tay:** filter idempotency cho `POST /orders` (lưu Postgres trước, Redis sau ở ngày 45); rate limit bằng Bucket4j.
 
+> **⚠️ Thiết kế Idempotency Phòng Thủ 3 Lớp chuẩn Fintech (MoMo / VNPAY / MB Bank / TCB):**
+> Khi đi phỏng vấn bài toán "Chống thanh toán/đặt hàng trùng khi user bấm đúp hoặc mạng retry", đừng chỉ trả lời "lưu key vào Redis". Hãy trình bày **Kiến trúc 3 lớp (Defense-in-Depth)**:
+> 1. **Lớp 1 — `Idempotency-Key` tại Gateway/Controller**: Client sinh UUID gắn vào header `Idempotency-Key`. Server kiểm tra Redis (`idempotency:{key}`): nếu trạng thái là `COMPLETED` và `request_hash` khớp → trả ngay HTTP response đã cache; nếu `request_hash` khác → trả `422 Unprocessable Entity`.
+> 2. **Lớp 2 — Redis Distributed Lock (Fail-Fast cho 2 request tới cùng 1 mili-giây)**:
+>    - Trước khi vào nghiệp vụ, gọi nguyên tử `SET lock:order:{idempotencyKey} {requestId} EX 15 NX`.
+>    - Nếu trả về `false` (đang có luồng khác xử lý chính key này) → trả ngay `409 Conflict` ("Giao dịch đang được xử lý"), không cho đụng vào DB.
+> 3. **Lớp 3 — Database Unique Constraint & Atomic State Transition (Chốt chặn sự thật cuối cùng)**:
+>    - Vì Redis có thể sập hoặc lock hết hạn khi JVM bị GC pause, bảng `orders`/`payment_transactions` dưới DB bắt buộc phải có `UNIQUE (idempotency_key)` và cập nhật trạng thái có điều kiện nguyên tử: `UPDATE orders SET status = 'PAID' WHERE id = :id AND status = 'PENDING'`.
+
 **Tự kiểm tra:** Idempotency implement thế nào, 2 request trùng đồng thời thì sao? So sánh các thuật toán rate limit.
 
 **LeetCode (20'):** LRU Cache (tự viết bằng HashMap + doubly linked list), Insert Interval.
@@ -49,6 +58,14 @@
 
 **Code tay:** cache chi tiết sản phẩm (cache-aside + TTL ngẫu nhiên), idempotency key sang Redis, distributed lock cho job `@Scheduled` (hoặc ShedLock), rate limit sliding window bằng Sorted Set.
 
+> **⚠️ 3 Bẫy Redis Production hay hỏi xoáy:**
+> 1. **Vì sao "Update DB rồi Update Cache" gây sai lệch dữ liệu (Stale Data)?**
+>    - Khi 2 luồng cùng ghi: Thread A ghi DB (`price=100`), Thread B ghi DB (`price=200`), nhưng Thread B cập nhật Redis (`200`) trước, rồi Thread A bị trễ mạng mới ghi đè Redis (`100`) → DB là `200` nhưng Cache lưu giá cũ `100` đến hết TTL!
+>    - **Chuẩn**: Dùng **Cache-Aside (Update DB trước → XÓA/Invalidate Cache sau)**, hoặc dùng CDC (Debezium đọc WAL xóa/cập nhật Redis).
+> 2. **Vì sao mở khóa Distributed Lock hoặc trừ kho Flash Sale trên Redis phải dùng Lua Script?**
+>    - Nếu viết trong Java `if (redis.get(lockKey).equals(myRequestId)) redis.del(lockKey);` thì giữa lệnh `get` và `del`, lock có thể vừa hết hạn TTL và được cấp cho Thread B → Thread A xóa nhầm lock của Thread B!
+>    - **Giải pháp**: Đưa kiểm tra + xóa (hoặc kiểm tra tồn kho + `DECR` + `SADD` user) vào **1 Redis Lua Script** (`EVAL`) để Redis thực thi **nguyên tử (atomic) 100%** trên single thread.
+
 **Tự kiểm tra:** Penetration vs breakdown vs avalanche? Update DB rồi xóa cache hay ngược lại? Distributed lock bằng Redis làm thế nào cho đúng?
 
 ---
@@ -63,6 +80,13 @@
 - Nén response (gzip), HTTP caching (`ETag`, `Cache-Control`).
 
 **Code tay:** viết script k6 cho `GET /products/{id}` và `POST /orders`; đo p95 trước/sau cache Redis; bảng số liệu vào `docs/performance.md`.
+
+> **⚠️ Câu hỏi tình huống thực chiến: "API `/orders` đang có p99 = 150ms bỗng dưng vọt lên 5.000ms lúc 2h chiều — bạn khoanh vùng nguyên nhân trong 10 phút theo thứ tự nào?"**
+> 1. **Phút 1–3 (Metrics — Grafana/Prometheus)**: Xem lỗi nằm ở tầng nào — HikariCP `pending/active connections` có chạm trần không? JVM Heap/GC pause có tăng vọt không? CPU pod có bị throttle không? Latency của Redis/Kafka/Downstream HTTP có cao không?
+> 2. **Phút 3–6 (Distributed Tracing — Zipkin/Jaeger/Tempo)**: Bắt 1 `traceId` có thời gian > 5s, mở biểu đồ thác nước (Span Waterfall) xem 4.9s nằm ở span nào (chờ mượn DB connection, chạy câu SQL, hay chờ HTTP bên thứ 3).
+> 3. **Phút 6–10 (DB Diagnostics & Thread Dump)**:
+>    - Nếu chậm ở DB: Mở `pg_stat_activity` (xem `wait_event_type = Lock` hay query ngâm lâu) + `pg_stat_statements` + `EXPLAIN ANALYZE`.
+>    - Nếu chậm trong JVM mà DB bình thường: Bắn `jstack <pid>` lấy **Thread Dump** kiểm tra các thread đang `BLOCKED` hoặc Virtual Thread bị `Pinned`.
 
 **Tự kiểm tra:** p99 là gì, vì sao quan trọng? API chậm bạn chẩn đoán theo thứ tự nào? Pool size chọn thế nào?
 
