@@ -1,20 +1,17 @@
-# Java Middle Notes
+# Java Middle Notes — Lộ Trình & Ngân Hàng Phỏng Vấn Thực Chiến (2026–2027)
 
-Repo ghi chú cho lộ trình Java Middle 3 tháng (11/2026 → đầu 02/2027).
+Kho lưu trữ kế hoạch học tập, ghi chú kỹ thuật và ngân hàng câu hỏi phỏng vấn thực chiến hướng tới mục tiêu **Java Middle Backend Developer (2–4 năm kinh nghiệm)** tự tin phỏng vấn sau Tết Đinh Mùi 2027.
 
-## Quy tắc ghi chú
+## 📚 Danh mục tài liệu chính
 
-- Mỗi chủ đề 1 file, cấu trúc cố định: Khái niệm → Ví dụ code tay → Lỗi từng gặp → Câu hỏi phỏng vấn tự trả lời.
-- Ghi bằng lời của mình. Copy nguyên tutorial mà không hiểu lại thì khi phỏng vấn sẽ không nói được.
-- Cuối tuần nào cũng có 1 file review: tuần này làm được gì, chưa hiểu gì, tuần sau sửa gì.
+1. **[`lo-trinh-java-middle-3-thang-v3.md`](lo-trinh-java-middle-3-thang-v3.md)** — **Lộ trình tổng thể 13 tuần trước Tết + 4 tuần sau Tết**:
+   - Đánh giá cấu trúc, nguyên tắc 3 đầu ra, tiến hóa của project `shop-order-platform` và danh mục hơn 110 câu hỏi phỏng vấn.
+2. **[`ke-hoach-hang-ngay/README.md`](ke-hoach-hang-ngay/README.md)** — **Kế hoạch hành động chi tiết từng ngày (Tuần 1 → Tuần 17)**:
+   - Từng ngày đều có: *Kiến thức phải nắm* → *Code tay* → *⚠️ Bẫy phỏng vấn thực chiến (Interview Traps)* → *Tự kiểm tra* → *LeetCode*.
+3. **[`ngan-hang-cau-hoi-phong-van-theo-do-kho.md`](ngan-hang-cau-hoi-phong-van-theo-do-kho.md)** — **Ngân hàng câu hỏi & đáp án chuẩn theo 4 cấp độ khó (Level 1 → Level 4)**:
+   - Tổng hợp từ đề thi & phỏng vấn thực tế tại Việt Nam (MB Bank, Viettel, TCB, VPBank, MoMo, VNPAY, NAB, ANZ, TymeX, EPAM, KMS, NashTech, Grab, Shopee, Zalo, Naver).
+4. **[`ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md`](ke-hoach-hang-ngay/tuan-14-17-chien-luoc-phong-van-sau-tet.md)** — **Chiến lược cày phỏng vấn 4 tuần Sau Tết & Đóng gói kinh nghiệm FPT**:
+   - Phân tích format vòng thi của 3 nhóm công ty, khung đóng gói 3 câu chuyện thực tế ở FPT và lịch rải CV 3 đợt (Wave 1/2/3).
+5. **[`skill-audit.md`](skill-audit.md)** — **Bảng tự chấm và theo dõi tiến độ 19 kỹ năng cốt lõi**.
+6. **[`checklist-lo-trinh-java-middle-chi-tiet.xlsx`](checklist-lo-trinh-java-middle-chi-tiet.xlsx)** — **File Excel Checklist chi tiết từng ngày (17 Sheets, >1.350 mục kiến thức, bẫy phỏng vấn, lab & câu hỏi tự động tính % tiến độ)**.
 
-## Cấu trúc
-
-- `skill-audit.md` — bảng tự chấm kỹ năng, cập nhật mỗi tháng.
-- `tuan-01-java-core.md` → `tuan-13-dong-goi.md` — ghi chú theo từng tuần (tạo dần, đừng tạo trước hết rồi bỏ trống).
-- `cau-hoi-phong-van.md` — ngân hàng câu hỏi, mỗi câu phải tự trả lời miệng được trước khi tick.
-- `loi-thuong-gap.md` — lỗi Docker, Kafka, Postgres, pipeline... và cách fix, để sau này tra lại trong 1 phút.
-
-## Commit
-
-Dùng tiền tố rõ ràng: `docs(java-core): ...`, `docs(kafka): ...`, `docs(interview): ...`
