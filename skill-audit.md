@@ -1,6 +1,12 @@
 # Bảng tự chấm kỹ năng — Giai đoạn 0
 
-Thang điểm: 1 = mới nghe tên, 2 = hiểu sơ, 3 = làm được có hướng dẫn, 4 = làm độc lập, 5 = giải thích và dạy lại được.
+0: Chưa từng nghe / chưa chạm vào.
+1: Biết tên, chưa làm bao giờ.
+2: Đã làm theo hướng dẫn / tutorial, chưa làm thật.
+3: Đã làm thật trong project, nhưng cần người khác review.
+4: Làm độc lập được, giải thích được vì sao chọn cách đó.
+5: Dạy lại được cho người khác, xử lý được case khó.
+Bảng em phải điền đủ 3 cột: Kỹ năng | Điểm (0–5) | Bằng chứng cụ thể
 Điểm "sơ bộ" dưới đây mình điền từ CV của bạn (FPT, Spring Boot, PostgreSQL, Jenkins/GitLab CI/CD) — **đây chỉ là ước lượng, bạn sửa lại theo cảm nhận thật**. Điểm mục tiêu là mức cần đạt trước khi đi phỏng vấn.
 
 | Kỹ năng | Điểm sơ bộ | Bằng chứng / ghi chú của bạn (sửa tại đây) | Mục tiêu |
